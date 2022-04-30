@@ -4,12 +4,20 @@ use rand::Rng;
 use sdl2::keyboard::Scancode;
 use std::time::Duration;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum Direction {
     Up,
     Down,
     Left,
     Right,
+}
+
+macro_rules! set_if_not_opp {
+    ($i:ident, $e:expr, $opp:expr) => {
+        if $i != $opp {
+            $i = $e
+        }
+    };
 }
 
 fn main() {
@@ -35,12 +43,13 @@ fn main() {
         let keys = get_keyboard_state(ctx).keys;
 
         for key in keys {
+            use Direction::*;
             match key {
                 Scancode::Q => game.terminate(),
-                Scancode::W | Scancode::Up => dir = Direction::Up,
-                Scancode::A | Scancode::Left => dir = Direction::Left,
-                Scancode::S | Scancode::Down => dir = Direction::Down,
-                Scancode::D | Scancode::Right => dir = Direction::Right,
+                Scancode::W | Scancode::Up => set_if_not_opp!(dir, Up, Down),
+                Scancode::A | Scancode::Left => set_if_not_opp!(dir, Left, Right),
+                Scancode::S | Scancode::Down => set_if_not_opp!(dir, Down, Up),
+                Scancode::D | Scancode::Right => set_if_not_opp!(dir, Right, Left),
                 _ => (),
             };
         }
@@ -73,7 +82,7 @@ fn main() {
             }
         };
 
-        if cat_box::physics::check_for_collision(&snake[0], &apple) {
+        if !cat_box::physics::check_for_collision_with_collection(&apple, &snake).is_empty() {
             let x = thread_rng().gen_range(0..=27) * 37;
             let y = thread_rng().gen_range(0..=27) * 37;
 
