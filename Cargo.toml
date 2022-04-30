@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 cat-box = "0.1.4"
+rand = "0.8.5"
 sdl2 = "0.35.2"

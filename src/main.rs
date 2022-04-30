@@ -1,4 +1,6 @@
 use cat_box::{get_keyboard_state, Game, Sprite, SpriteCollection};
+use rand::thread_rng;
+use rand::Rng;
 use sdl2::keyboard::Scancode;
 use std::time::Duration;
 
@@ -19,6 +21,13 @@ fn main() {
         let s = Sprite::new("snakecell.png", x * 37, y * 37).unwrap();
         snake.push(s);
     }
+
+    let mut apple = {
+        let x = thread_rng().gen_range(0..=27);
+        let y = thread_rng().gen_range(0..=27);
+
+        Sprite::new("apple.png", x * 37, y * 37).unwrap()
+    };
 
     let mut dir = Direction::Left;
 
@@ -66,6 +75,7 @@ fn main() {
 
         // So that the snake doesn't move at super speed
         std::thread::sleep(Duration::from_millis(125));
+        apple.draw(ctx).unwrap();
         snake.draw(ctx).unwrap();
     })
     .unwrap();
