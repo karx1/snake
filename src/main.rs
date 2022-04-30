@@ -105,6 +105,24 @@ fn main() {
             snake.push(s);
         }
 
+        {
+            let (mut x, mut y) = snake[0].position();
+            x /= 37;
+            y /= 37;
+
+            if x == 0 {
+                snake[0].translate((27 * 37, 0));
+            } else if x == 27 {
+                snake[0].translate((-27 * 37, 0));
+            };
+
+            if y == 0 {
+                snake[0].translate((0, -27 * 37));
+            } else if y == 27 {
+                snake[0].translate((0, 27 * 37));
+            }
+        }
+
         // So that the snake doesn't move at super speed
         std::thread::sleep(Duration::from_millis(125));
         apple.draw(ctx).unwrap();
