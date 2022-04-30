@@ -59,7 +59,11 @@ fn main() {
         for key in keys {
             use Direction::*;
             match key {
-                Scancode::Q => game.terminate(),
+                Scancode::Q | Scancode::Escape => {
+                    println!("Game over!");
+                    println!("Your score was: {}", score);
+                    game.terminate();
+                }
                 Scancode::W | Scancode::Up => set_if_not_opp!(dir, Up, Down),
                 Scancode::A | Scancode::Left => set_if_not_opp!(dir, Left, Right),
                 Scancode::S | Scancode::Down => set_if_not_opp!(dir, Down, Up),
@@ -95,6 +99,15 @@ fn main() {
                 snake[0].translate((37, 0));
             }
         };
+
+        {
+            let hitted = cat_box::physics::check_for_collision_with_collection(&snake[0], &snake);
+            if hitted.len() > 1 {
+                println!("Game over!");
+                println!("Your score was: {}", score);
+                game.terminate();
+            }
+        }
 
         if !cat_box::physics::check_for_collision_with_collection(&apple, &snake).is_empty() {
             let x = thread_rng().gen_range(0..=27) * 37;
