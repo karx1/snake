@@ -1,4 +1,4 @@
-use cat_box::{get_keyboard_state, Game, Sprite, SpriteCollection};
+use cat_box::{draw_text, get_keyboard_state, Game, Sprite, SpriteCollection};
 use rand::thread_rng;
 use rand::Rng;
 use sdl2::keyboard::Scancode;
@@ -39,7 +39,21 @@ fn main() {
 
     let mut dir = Direction::Left;
 
+    let mut score = 0u64;
+
     game.run(|ctx| {
+        draw_text(
+            ctx,
+            format!("Score: {}", score),
+            "ibm_bios-2y.ttf",
+            36,
+            (100, 100),
+            cat_box::TextMode::Transparent {
+                colour: (255, 255, 255),
+            },
+        )
+        .unwrap();
+
         let keys = get_keyboard_state(ctx).keys;
 
         for key in keys {
@@ -103,6 +117,8 @@ fn main() {
 
             let s = Sprite::new("snakecell.png", newx, newy).unwrap();
             snake.push(s);
+
+            score += 1;
         }
 
         {
