@@ -28,14 +28,27 @@ fn main() {
         for key in keys {
             match key {
                 Scancode::Q => game.terminate(),
-                Scancode::W => dir = Direction::Up,
-                Scancode::A => dir = Direction::Left,
-                Scancode::S => dir = Direction::Down,
-                Scancode::D => dir = Direction::Right,
+                Scancode::W | Scancode::Up => dir = Direction::Up,
+                Scancode::A | Scancode::Left => dir = Direction::Left,
+                Scancode::S | Scancode::Down => dir = Direction::Down,
+                Scancode::D | Scancode::Right => dir = Direction::Right,
                 _ => (),
             };
         }
 
+        {
+            let mut last_part = snake[0].position();
+
+            for s in snake.iter().skip(1) {
+                let (lastx, lasty) = last_part;
+                let (x, y) = s.position();
+                let (xdiff, ydiff) = (lastx - x, y - lasty);
+                s.translate((xdiff, ydiff));
+                last_part = s.position();
+            }
+        }
+
+        // The snake head needs to be moved after the body or else the body will just collapse into the head
         match dir {
             Direction::Up => {
                 snake[0].translate((0, 37));
@@ -51,18 +64,7 @@ fn main() {
             }
         };
 
-        {
-            let mut last_part = snake[0].position();
-
-            for s in &mut *snake {
-                let (lastx, lasty) = last_part;
-                let (x, y) = s.position();
-                let (xdiff, ydiff) = (lastx - x, y - lasty);
-                s.translate((xdiff, ydiff));
-                last_part = s.position();
-            }
-        }
-
+        // So that the snake doesn't move at super speed
         std::thread::sleep(Duration::from_millis(125));
         snake.draw(ctx).unwrap();
     })
