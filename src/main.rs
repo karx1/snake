@@ -126,16 +126,20 @@ fn main() {
             x /= 37;
             y /= 37;
 
-            if x == 0 {
-                snake[0].translate((27 * 37, 0));
-            } else if x == 27 {
-                snake[0].translate((-27 * 37, 0));
-            };
+            if dir == Direction::Left || dir == Direction::Right {
+                if x == 0 {
+                    snake[0].translate((27 * 37, 0));
+                } else if x == 27 {
+                    snake[0].translate((-27 * 37, 0));
+                }
+            }
 
-            if y == 0 {
-                snake[0].translate((0, -27 * 37));
-            } else if y == 27 {
-                snake[0].translate((0, 27 * 37));
+            if dir == Direction::Up || dir == Direction::Down {
+                if y == 0 {
+                    snake[0].translate((0, -27 * 37));
+                } else if y == 27 {
+                    snake[0].translate((0, 27 * 37));
+                }
             }
         }
 
