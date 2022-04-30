@@ -52,8 +52,8 @@ fn main() {
                 let (lastx, lasty) = last_part;
                 let (x, y) = s.position();
                 let (xdiff, ydiff) = (lastx - x, y - lasty);
-                s.translate((xdiff, ydiff));
                 last_part = s.position();
+                s.translate((xdiff, ydiff));
             }
         }
 
@@ -80,6 +80,20 @@ fn main() {
             let (currx, curry) = apple.position();
             let (xdiff, ydiff) = (x - currx, curry - y);
             apple.translate((xdiff, ydiff));
+            let second_to_last = snake[snake.len() - 2].position();
+            let last = snake[snake.len() - 1].position();
+
+            let direc = check_direction(last, second_to_last);
+
+            let (newx, newy) = match direc {
+                Direction::Left => (last.0 - 37, last.1),
+                Direction::Right => (last.0 + 37, last.1),
+                Direction::Up => (last.0, last.1 - 37),
+                Direction::Down => (last.0, last.1 + 37),
+            };
+
+            let s = Sprite::new("snakecell.png", newx, newy).unwrap();
+            snake.push(s);
         }
 
         // So that the snake doesn't move at super speed
@@ -88,4 +102,19 @@ fn main() {
         snake.draw(ctx).unwrap();
     })
     .unwrap();
+}
+
+fn check_direction(square1: (i32, i32), square2: (i32, i32)) -> Direction {
+    if square1.0 < square2.0 {
+        return Direction::Left;
+    } else if square1.0 > square2.0 {
+        return Direction::Right;
+    };
+    if square1.1 > square2.1 {
+        return Direction::Up;
+    } else if square1.1 < square2.1 {
+        return Direction::Down;
+    };
+
+    Direction::Up
 }
