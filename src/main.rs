@@ -179,5 +179,7 @@ fn check_direction(square1: (i32, i32), square2: (i32, i32)) -> Direction {
         return Direction::Down;
     };
 
-    Direction::Up
+    unreachable!(
+        "why are we still here? just to suffer? (this should never ever ever happen, by the way)"
+    );
 }
