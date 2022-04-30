@@ -127,18 +127,21 @@ fn main() {
             y /= 37;
 
             if dir == Direction::Left || dir == Direction::Right {
-                if x == 0 {
-                    snake[0].translate((27 * 37, 0));
-                } else if x == 27 {
-                    snake[0].translate((-27 * 37, 0));
+                if x <= 0 {
+                    let diff = (27 * 37) - (x * 37);
+                    snake[0].translate((diff, 0));
+                } else if x >= 27 {
+                    let diff = 0 - (x * 37);
+                    snake[0].translate((diff, 0));
                 }
             }
 
             if dir == Direction::Up || dir == Direction::Down {
-                if y == 0 {
-                    snake[0].translate((0, -27 * 37));
-                } else if y == 27 {
-                    snake[0].translate((0, 27 * 37));
+                if y <= 0 {
+                    let diff = (y * 37) - (27 * 37);
+                    snake[0].translate((0, diff));
+                } else if y >= 27 {
+                    snake[0].translate((0, (y * 37)));
                 }
             }
         }
