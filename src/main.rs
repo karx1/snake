@@ -73,6 +73,15 @@ fn main() {
             }
         };
 
+        if cat_box::physics::check_for_collision(&snake[0], &apple) {
+            let x = thread_rng().gen_range(0..=27) * 37;
+            let y = thread_rng().gen_range(0..=27) * 37;
+
+            let (currx, curry) = apple.position();
+            let (xdiff, ydiff) = (x - currx, curry - y);
+            apple.translate((xdiff, ydiff));
+        }
+
         // So that the snake doesn't move at super speed
         std::thread::sleep(Duration::from_millis(125));
         apple.draw(ctx).unwrap();
