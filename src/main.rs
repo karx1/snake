@@ -1,3 +1,6 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::similar_names, clippy::too_many_lines, clippy::enum_glob_use)]
+
 use cat_box::{draw_text, get_keyboard_state, Game, Sprite, SpriteCollection};
 use rand::thread_rng;
 use rand::Rng;
@@ -172,18 +175,17 @@ fn main() {
 }
 
 fn check_direction(square1: (i32, i32), square2: (i32, i32)) -> Direction {
-    if square1.0 < square2.0 {
-        return Direction::Left;
-    } else if square1.0 > square2.0 {
-        return Direction::Right;
-    };
-    if square1.1 > square2.1 {
-        return Direction::Up;
-    } else if square1.1 < square2.1 {
-        return Direction::Down;
-    };
-
-    unreachable!(
-        "why are we still here? just to suffer? (this should never ever ever happen, by the way)"
-    );
+    use std::cmp::Ordering::*;
+    use Direction::*;
+    match square1.0.cmp(&square2.0) {
+        Less => Left,
+        Greater => Right,
+        Equal => match square1.1.cmp(&square2.1) {
+            Less => Down,
+            Greater => Up,
+            Equal => unreachable!(
+                "why are we still here? just to suffer? (this should never ever ever happen, by the way)"
+            ),
+        },
+    }
 }
