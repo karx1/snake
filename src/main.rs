@@ -2,7 +2,7 @@ use cat_box::{draw_text, get_keyboard_state, Game, Sprite, SpriteCollection};
 use rand::thread_rng;
 use rand::Rng;
 use sdl2::keyboard::Scancode;
-use std::time::Duration;
+use std::time::Instant;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum Direction {
@@ -41,6 +41,8 @@ fn main() {
 
     let mut score = 0u64;
 
+    let mut time = Instant::now();
+
     game.run(|ctx| {
         draw_text(
             ctx,
@@ -72,95 +74,97 @@ fn main() {
             };
         }
 
-        {
-            let mut last_part = snake[0].position();
+        if time.elapsed().as_millis() >= 125 {
+            {
+                let mut last_part = snake[0].position();
 
-            for s in snake.iter().skip(1) {
-                let (lastx, lasty) = last_part;
-                let (x, y) = s.position();
-                let (xdiff, ydiff) = (lastx - x, y - lasty);
-                last_part = s.position();
-                s.translate((xdiff, ydiff));
+                for s in snake.iter().skip(1) {
+                    let (lastx, lasty) = last_part;
+                    let (x, y) = s.position();
+                    let (xdiff, ydiff) = (lastx - x, y - lasty);
+                    last_part = s.position();
+                    s.translate((xdiff, ydiff));
+                }
             }
-        }
 
-        // The snake head needs to be moved after the body or else the body will just collapse into the head
-        match dir {
-            Direction::Up => {
-                snake[0].translate((0, 37));
-            }
-            Direction::Left => {
-                snake[0].translate((-37, 0));
-            }
-            Direction::Down => {
-                snake[0].translate((0, -37));
-            }
-            Direction::Right => {
-                snake[0].translate((37, 0));
-            }
-        };
-
-        {
-            let hitted = cat_box::physics::check_for_collision_with_collection(&snake[0], &snake);
-            if hitted.len() > 1 {
-                println!("Game over!");
-                println!("Your score was: {}", score);
-                game.terminate();
-            }
-        }
-
-        if !cat_box::physics::check_for_collision_with_collection(&apple, &snake).is_empty() {
-            let x = thread_rng().gen_range(0..=27) * 37;
-            let y = thread_rng().gen_range(0..=27) * 37;
-
-            let (currx, curry) = apple.position();
-            let (xdiff, ydiff) = (x - currx, curry - y);
-            apple.translate((xdiff, ydiff));
-            let second_to_last = snake[snake.len() - 2].position();
-            let last = snake[snake.len() - 1].position();
-
-            let direc = check_direction(last, second_to_last);
-
-            let (newx, newy) = match direc {
-                Direction::Left => (last.0 - 37, last.1),
-                Direction::Right => (last.0 + 37, last.1),
-                Direction::Up => (last.0, last.1 - 37),
-                Direction::Down => (last.0, last.1 + 37),
+            // The snake head needs to be moved after the body or else the body will just collapse into the head
+            match dir {
+                Direction::Up => {
+                    snake[0].translate((0, 37));
+                }
+                Direction::Left => {
+                    snake[0].translate((-37, 0));
+                }
+                Direction::Down => {
+                    snake[0].translate((0, -37));
+                }
+                Direction::Right => {
+                    snake[0].translate((37, 0));
+                }
             };
 
-            let s = Sprite::new("snakecell.png", newx, newy).unwrap();
-            snake.push(s);
-
-            score += 1;
-        }
-
-        {
-            let (mut x, mut y) = snake[0].position();
-            x /= 37;
-            y /= 37;
-
-            if dir == Direction::Left || dir == Direction::Right {
-                if x <= 0 {
-                    let diff = (27 * 37) - (x * 37);
-                    snake[0].translate((diff, 0));
-                } else if x >= 27 {
-                    let diff = 0 - (x * 37);
-                    snake[0].translate((diff, 0));
+            {
+                let hitted =
+                    cat_box::physics::check_for_collision_with_collection(&snake[0], &snake);
+                if hitted.len() > 1 {
+                    println!("Game over!");
+                    println!("Your score was: {}", score);
+                    game.terminate();
                 }
             }
 
-            if dir == Direction::Up || dir == Direction::Down {
-                if y <= 0 {
-                    let diff = (y * 37) - (27 * 37);
-                    snake[0].translate((0, diff));
-                } else if y >= 27 {
-                    snake[0].translate((0, (y * 37)));
+            if !cat_box::physics::check_for_collision_with_collection(&apple, &snake).is_empty() {
+                let x = thread_rng().gen_range(0..=27) * 37;
+                let y = thread_rng().gen_range(0..=27) * 37;
+
+                let (currx, curry) = apple.position();
+                let (xdiff, ydiff) = (x - currx, curry - y);
+                apple.translate((xdiff, ydiff));
+                let second_to_last = snake[snake.len() - 2].position();
+                let last = snake[snake.len() - 1].position();
+
+                let direc = check_direction(last, second_to_last);
+
+                let (newx, newy) = match direc {
+                    Direction::Left => (last.0 - 37, last.1),
+                    Direction::Right => (last.0 + 37, last.1),
+                    Direction::Up => (last.0, last.1 - 37),
+                    Direction::Down => (last.0, last.1 + 37),
+                };
+
+                let s = Sprite::new("snakecell.png", newx, newy).unwrap();
+                snake.push(s);
+
+                score += 1;
+            }
+
+            {
+                let (mut x, mut y) = snake[0].position();
+                x /= 37;
+                y /= 37;
+
+                if dir == Direction::Left || dir == Direction::Right {
+                    if x <= 0 {
+                        let diff = (27 * 37) - (x * 37);
+                        snake[0].translate((diff, 0));
+                    } else if x >= 27 {
+                        let diff = 0 - (x * 37);
+                        snake[0].translate((diff, 0));
+                    }
+                }
+
+                if dir == Direction::Up || dir == Direction::Down {
+                    if y <= 0 {
+                        let diff = (y * 37) - (27 * 37);
+                        snake[0].translate((0, diff));
+                    } else if y >= 27 {
+                        snake[0].translate((0, (y * 37)));
+                    }
                 }
             }
-        }
 
-        // So that the snake doesn't move at super speed
-        std::thread::sleep(Duration::from_millis(125));
+            time = Instant::now();
+        }
         apple.draw(ctx).unwrap();
         snake.draw(ctx).unwrap();
     })
