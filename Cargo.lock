@@ -10,9 +10,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "cat-box"
-version = "0.1.6"
+version = "22.6.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24bda0d6fb9dc5a286c9afe6286b1de1f3fe7175310b4b0c2c34174fccafbd19"
+checksum = "718fced54b0fc65b4c154bad8cbd2826447a91a2c2d3980a94cd7e2beadcb73b"
 dependencies = [
  "sdl2",
 ]

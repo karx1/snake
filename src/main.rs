@@ -29,7 +29,7 @@ fn main() {
 
     let mut snake = SpriteCollection::with_capacity(snake_boxes.len());
     for (x, y) in snake_boxes {
-        let s = Sprite::new("snakecell.png", x * 37, y * 37).unwrap();
+        let s = Sprite::from_bytes(include_bytes!("../snakecell.png"), x * 37, y * 37).unwrap();
         snake.push(s);
     }
 
@@ -37,7 +37,7 @@ fn main() {
         let x = thread_rng().gen_range(0..=27);
         let y = thread_rng().gen_range(0..=27);
 
-        Sprite::new("apple.png", x * 37, y * 37).unwrap()
+        Sprite::from_bytes(include_bytes!("../apple.png"), x * 37, y * 37).unwrap()
     };
 
     let mut dir = Direction::Left;
@@ -82,8 +82,8 @@ fn main() {
                 let mut last_part = snake[0].position();
 
                 for s in snake.iter().skip(1) {
-                    let (lastx, lasty) = last_part;
-                    let (x, y) = s.position();
+                    let (lastx, lasty) = last_part.into();
+                    let (x, y) = s.position().into();
                     let (xdiff, ydiff) = (lastx - x, y - lasty);
                     last_part = s.position();
                     s.translate((xdiff, ydiff));
@@ -120,19 +120,19 @@ fn main() {
                 let x = thread_rng().gen_range(0..=27) * 37;
                 let y = thread_rng().gen_range(0..=27) * 37;
 
-                let (currx, curry) = apple.position();
+                let (currx, curry) = apple.position().into();
                 let (xdiff, ydiff) = (x - currx, curry - y);
                 apple.translate((xdiff, ydiff));
                 let second_to_last = snake[snake.len() - 2].position();
                 let last = snake[snake.len() - 1].position();
 
-                let direc = check_direction(last, second_to_last);
+                let direc = check_direction(last.into(), second_to_last.into());
 
                 let (newx, newy) = match direc {
-                    Direction::Left => (last.0 - 37, last.1),
-                    Direction::Right => (last.0 + 37, last.1),
-                    Direction::Up => (last.0, last.1 - 37),
-                    Direction::Down => (last.0, last.1 + 37),
+                    Direction::Left => (last.x - 37, last.y),
+                    Direction::Right => (last.x + 37, last.y),
+                    Direction::Up => (last.x, last.y - 37),
+                    Direction::Down => (last.x, last.y + 37),
                 };
 
                 let s = Sprite::new("snakecell.png", newx, newy).unwrap();
@@ -142,7 +142,7 @@ fn main() {
             }
 
             {
-                let (mut x, mut y) = snake[0].position();
+                let (mut x, mut y) = snake[0].position().into();
                 x /= 37;
                 y /= 37;
 
