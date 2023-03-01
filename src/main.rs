@@ -46,6 +46,8 @@ fn main() {
 
     let mut time = Instant::now();
 
+    let mut last_pressed = Scancode::A;
+
     game.run(|ctx| {
         draw_text(
             ctx,
@@ -62,22 +64,25 @@ fn main() {
         let keys = get_keyboard_state(ctx).keys;
 
         for key in keys {
-            use Direction::*;
             match key {
                 Scancode::Q | Scancode::Escape => {
                     println!("Game over!");
                     println!("Your score was: {}", score);
                     game.terminate();
                 }
+                s => last_pressed = s,
+            };
+        }
+
+        if time.elapsed().as_millis() >= 125 {
+            use Direction::*;
+            match last_pressed {
                 Scancode::W | Scancode::Up => set_if_not_opp!(dir, Up, Down),
                 Scancode::A | Scancode::Left => set_if_not_opp!(dir, Left, Right),
                 Scancode::S | Scancode::Down => set_if_not_opp!(dir, Down, Up),
                 Scancode::D | Scancode::Right => set_if_not_opp!(dir, Right, Left),
                 _ => (),
-            };
-        }
-
-        if time.elapsed().as_millis() >= 125 {
+            }
             {
                 let mut last_part = snake[0].position();
 
